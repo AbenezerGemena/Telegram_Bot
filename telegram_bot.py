@@ -3,6 +3,7 @@ import telebot
 from typing import final
 from telegram import Update
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes
+print("hello")
 
 API_KEY : final =  os.getenv('API_KEY')
 BOT_USERNAME : final = os.getenv('BOT_USERNAME')
