@@ -33,6 +33,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()  # Acknowledge the button press
 
+
     if query.data == "ask_question":
         # Prompt the user to type their question
         await query.message.reply_text("Please type your Christian apologetics question below:")
@@ -73,12 +74,13 @@ async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await update.message.reply_text(thank_you_message)
     print("Thank-you message sent to the user.")
+
 def main():
     app = ApplicationBuilder().token(API_KEY).build()
 
     # Add handlers
     app.add_handler(CommandHandler("start", start_command))
-    app.add_handler(CallbackQueryHandler(button_handler))  # Handle button interactions
+    app.add_handler(CallbackQueryHandler(button_handler))  
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, message_handle))
 
     print("Bot is running ......")
