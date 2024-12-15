@@ -6,6 +6,10 @@ from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, Messa
 
 load_dotenv()
 
+
+
+
+
 API_KEY: Final = os.getenv("API_KEY")
 BOT_USERNAME: Final = os.getenv("BOT_USERNAME")
 GROUP_ID: Final = int(os.getenv("GROUP_ID"))  # Ensure GROUP_ID is an integer
