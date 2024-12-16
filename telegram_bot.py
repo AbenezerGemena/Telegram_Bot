@@ -3,20 +3,27 @@ from dotenv import load_dotenv
 from typing import Final
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, MessageHandler, CallbackQueryHandler, filters
+import firebase_admin
+from firebase_admin import credentials,db
+import uuid
 
 load_dotenv()
 
 
 
 
-
-
 API_KEY: Final = os.getenv("API_KEY")
 BOT_USERNAME: Final = os.getenv("BOT_USERNAME")
-GROUP_ID: Final = int(os.getenv("GROUP_ID"))  # Ensure GROUP_ID is an integer
+GROUP_ID: Final = int(os.getenv("GROUP_ID")) 
 CHANNEL_LINK: Final = os.getenv("CHANNEL_LINK")
+database_URL : Final = str(os.getenv("DATABASE_URL"))
 
-# Debug to ensure GROUP_ID is loaded correctly
+cred = credentials.Certificate("credentials/yeberia-swoch-firebase-adminsdk-skklm-70460608c6.json")
+firebase_admin.initialize_app(cred, {
+    "databaseURL": database_URL
+})
+
+
 print(f"Loaded GROUP_ID: {GROUP_ID}")
 
 # Function to handle the /start command
@@ -36,7 +43,7 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handles button interactions."""
     query = update.callback_query
-    await query.answer()  # Acknowledge the button press
+    await query.answer()  
 
 
     if query.data == "ask_question":
@@ -49,9 +56,19 @@ async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_chat_id = update.message.chat.id  
     user_name = update.effective_user.first_name  
     user_question = update.message.text 
+    question_id = str(uuid.uuid4())[:8]  
 
-   
+    question_data = {
+        "user_id": user_chat_id,
+        "question": user_question,
+        "status": "pending.....",  
+        "answer": " ",
+        "user name": user_name
+    }
+    db.reference(f'questions/{question_id}').set(question_data)
+
     print(f"Message received from chat ID: {user_chat_id}")
+    print(f"Question id is {question_id}")
 
     if user_chat_id == GROUP_ID:
         print("Ignoring message from the group itself.")
@@ -79,6 +96,7 @@ async def message_handle(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     await update.message.reply_text(thank_you_message)
     print("Thank-you message sent to the user.")
+
 
 def main():
     app = ApplicationBuilder().token(API_KEY).build()
